@@ -96,12 +96,12 @@ extern "C" {
     } yajl_callbacks;
 
     /** allocate a parser handle
-     *  \param callbacks  a yajl callbacks structure specifying the
+     *  \param callbacks  a yajl_callbacks structure specifying the
      *                    functions to call when different JSON entities
      *                    are encountered in the input text.  May be NULL,
      *                    which is only useful for validation.
-     *  \param afs        memory allocation functions, may be NULL for to use
-     *                    C runtime library routines (malloc and friends) 
+     *  \param afs        memory allocation functions, may be NULL to use the
+     *                    C runtime library routines (malloc and friends).
      *  \param ctx        a context pointer that will be passed to callbacks.
      */
     YAJL_API yajl_handle yajl_alloc(const yajl_callbacks * callbacks,

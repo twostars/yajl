@@ -2,6 +2,5 @@
 
 int yajl_version(void)
 {
-	return YAJL_VERSION;
+    return YAJL_VERSION;
 }
-
