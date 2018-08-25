@@ -152,7 +152,7 @@ static const char charLookupTable[256] =
 /*10*/ IJC    , IJC    , IJC    , IJC    , IJC    , IJC    , IJC    , IJC    ,
 /*18*/ IJC    , IJC    , IJC    , IJC    , IJC    , IJC    , IJC    , IJC    ,
 
-/*20*/ 0      , 0      , NFP|VEC|IJC, 0  , VIC    , 0      , 0      , 0      ,
+/*20*/ 0      , 0      , NFP|VEC, 0      , VIC    , 0      , 0      , NFP|VEC,
 /*28*/ 0      , 0      , 0      , 0      , 0      , 0      , 0      , VEC    ,
 /*30*/ VHC|VIC, VHC|VIC, VHC|VIC, VHC|VIC, VHC|VIC, VHC|VIC, VHC|VIC, VHC|VIC,
 /*38*/ VHC|VIC, VHC|VIC, 0      , 0      , 0      , 0      , 0      , 0      ,
@@ -164,7 +164,7 @@ static const char charLookupTable[256] =
 
 /*60*/ 0      , VHC|VIC, VEC|VHC|VIC, VHC|VIC, VHC|VIC, VHC|VIC, VEC|VHC|VIC, VIC,
 /*68*/ VIC    , VIC    , VIC    , VIC    , VIC    , VIC    , VEC|VIC, VIC    ,
-/*70*/ VIC    , VIC    , VEC    , VIC    , VEC|VIC, VIC    , VIC    , VIC    ,
+/*70*/ VIC    , VIC    , VEC|VIC, VIC    , VEC|VIC, VIC    , VIC    , VIC    ,
 /*78*/ VIC    , VIC    , VIC    , 0      , 0      , 0      , 0      , 0      ,
 
        NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    ,
@@ -276,7 +276,7 @@ yajl_string_scan(const unsigned char * buf, size_t len, int utf8check)
 
 static yajl_tok
 yajl_lex_string(yajl_lexer lexer, const unsigned char * jsonText,
-                size_t jsonTextLen, size_t * offset)
+                size_t jsonTextLen, size_t * offset, const char quote)
 {
     yajl_tok tok = yajl_tok_error;
     int hasEscapes = 0;
@@ -311,7 +311,7 @@ yajl_lex_string(yajl_lexer lexer, const unsigned char * jsonText,
         curChar = readChar(lexer, jsonText, offset);
 
         /* quote terminates */
-        if (curChar == '"') {
+        if (curChar == quote) {
             tok = yajl_tok_string;
             break;
         }
@@ -405,7 +405,7 @@ yajl_lex_string(yajl_lexer lexer, const unsigned char * jsonText,
 
 static yajl_tok
 yajl_lex_identifier(yajl_lexer lexer, const unsigned char * jsonText,
-                size_t jsonTextLen, size_t * offset)
+                    size_t jsonTextLen, size_t * offset)
 {
     unsigned char c;
 
@@ -691,9 +691,11 @@ yajl_lex_lex(yajl_lexer lexer, const unsigned char * jsonText,
                 }
                 goto lexed;
             }
+            case '\'':
+                if (!lexer->allowJson5) goto invalid;
+                /* Fall through... */
             case '"': {
-                tok = yajl_lex_string(lexer, (const unsigned char *) jsonText,
-                                      jsonTextLen, offset);
+                tok = yajl_lex_string(lexer, jsonText, jsonTextLen, offset, c);
                 goto lexed;
             }
             case '+': case '.':
@@ -704,8 +706,7 @@ yajl_lex_lex(yajl_lexer lexer, const unsigned char * jsonText,
             case '5': case '6': case '7': case '8': case '9': {
                 /* integer parsing wants to start from the beginning */
                 unreadChar(lexer, offset);
-                tok = yajl_lex_number(lexer, (const unsigned char *) jsonText,
-                                      jsonTextLen, offset);
+                tok = yajl_lex_number(lexer, jsonText, jsonTextLen, offset);
                 goto lexed;
             }
             case '/':
@@ -816,8 +817,11 @@ yajl_tok yajl_lex_key(yajl_lexer lexer, const unsigned char * jsonText,
             case '}':
                 tok = yajl_tok_right_brace;
                 goto lexed;
+            case '\'':
+                if (!lexer->allowJson5) goto invalid;
+                /* Fall through... */
             case '"': {
-                tok = yajl_lex_string(lexer, jsonText, jsonTextLen, offset);
+                tok = yajl_lex_string(lexer, jsonText, jsonTextLen, offset, c);
                 goto lexed;
             }
             case '/':
@@ -852,6 +856,7 @@ yajl_tok yajl_lex_key(yajl_lexer lexer, const unsigned char * jsonText,
                     tok = yajl_lex_identifier(lexer, jsonText, jsonTextLen, offset);
                 }
                 else {
+  invalid:
                     lexer->error = yajl_lex_invalid_char;
                     tok = yajl_tok_error;
                 }
