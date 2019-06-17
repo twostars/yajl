@@ -138,6 +138,12 @@ extern "C" {
     YAJL_API yajl_gen_status yajl_gen_array_open(yajl_gen hand);
     YAJL_API yajl_gen_status yajl_gen_array_close(yajl_gen hand);
 
+#define YAJL_HAS_GEN_VERBATIM 1
+    /** write the string verbatim (unchanged). the string must be a valid
+     *  JSON value. No validation is performed. */
+    YAJL_API yajl_gen_status yajl_gen_verbatim(yajl_gen g,
+                                               const void * str, size_t len);
+
     /** access the null terminated generator buffer.  If incrementally
      *  outputing JSON, one should call yajl_gen_clear to clear the
      *  buffer.  This allows stream generation. */
