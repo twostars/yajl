@@ -77,7 +77,7 @@ yajl_string_encode(const yajl_print_t print,
                 }
                 goto ashex;
             default:
-                if ((unsigned char) str[end] < 32) {
+                if ((unsigned char) str[end] < 32 || (unsigned char) str[end] > 127) {
             ashex:
                     CharToHex(str[end], hexAt);
                     escaped = hexBuf;
