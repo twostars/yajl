@@ -25,6 +25,7 @@
 #define __YAJL_GEN_H__
 
 #include <stddef.h>
+#include <stdarg.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -146,6 +147,8 @@ extern "C" {
      *  \returns Zero in case of error, non-zero otherwise.
      */
     YAJL_API int yajl_gen_config(yajl_gen hand, int option, ...);
+
+    YAJL_API int yajl_gen_config_v(yajl_gen hand, int option, va_list ap);
 
     /** Allocate a generator handle
      *  \param allocFuncs An optional pointer to a structure which allows the
