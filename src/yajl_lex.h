@@ -61,6 +61,9 @@ yajl_lexer yajl_lex_alloc(yajl_alloc_funcs * alloc,
                           unsigned int validateUTF8,
                           unsigned int allowJson5);
 
+void yajl_lex_reset(yajl_lexer l);
+
+
 void yajl_lex_free(yajl_lexer lexer);
 
 /**
