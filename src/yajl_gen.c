@@ -374,6 +374,16 @@ yajl_gen_array_close(yajl_gen g)
 }
 
 yajl_gen_status
+yajl_gen_verbatim(yajl_gen g, const void * str, size_t len)
+{
+    ENSURE_VALID_STATE; INSERT_SEP; INSERT_WHITESPACE;
+    g->print(g->ctx, str, len);
+    APPENDED_ATOM;
+    FINAL_NEWLINE;
+    return yajl_gen_status_ok;
+}
+
+yajl_gen_status
 yajl_gen_get_buf(yajl_gen g, const unsigned char ** buf,
                  size_t * len)
 {
