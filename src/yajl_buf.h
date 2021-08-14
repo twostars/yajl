@@ -22,8 +22,8 @@
 
 /*
  * Implementation/performance notes.  If this were moved to a header
- * only implementation using #define's where possible we might be 
- * able to sqeeze a little performance out of the guy by killing function
+ * only implementation using #defines where possible we might be
+ * able to squeeze a little performance out of the guy by killing function
  * call overhead.  YMMV.
  */
 
